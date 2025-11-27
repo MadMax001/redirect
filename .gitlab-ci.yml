@@ -35,7 +35,6 @@ test:
       alias: docker
   variables:
     DOCKER_HOST: "tcp://docker:2375"
-    DOCKER_TLS_CERTDIR: ""
     TESTCONTAINERS_HOST_OVERRIDE: "docker"
     TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE: "/var/run/docker.sock"
   before_script:
