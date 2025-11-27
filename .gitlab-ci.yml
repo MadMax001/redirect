@@ -64,12 +64,6 @@ docker-build:
   services:
     - name: docker:dind
       alias: docker
-  before_script:
-    - |
-      echo "Waiting for Docker dind to generate certificates..."
-      timeout 120 sh -c "until [ -f /certs/client/ca.pem ]; do sleep 2; done"
-      echo "Certificates found:"
-      ls -la /certs/client/
   script:
     - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA -t $CI_REGISTRY_IMAGE:latest .
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
