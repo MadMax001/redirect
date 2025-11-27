@@ -1,9 +1,10 @@
+# variables:
+#   DOCKER_HOST: tcp://docker:2376
+#   DOCKER_TLS_CERTDIR: "/certs"
+#   DOCKER_TLS_VERIFY: "1"
+#   DOCKER_CERT_PATH: "/certs/client"
 variables:
-  DOCKER_HOST: tcp://docker:2376
-  DOCKER_TLS_CERTDIR: "/certs"
-  DOCKER_TLS_VERIFY: "1"
-  DOCKER_CERT_PATH: "/certs/client"
-
+  DOCKER_HOST: unix:///var/run/docker.sock
 stages:
   - build
   - test
@@ -61,15 +62,8 @@ test:
 docker-build:
   stage: docker-build
   image: docker:dind
-  before_script:
-    - |
-      echo "Waiting for Docker dind to generate certificates..."
-      timeout 120 sh -c "until [ -f /certs/client/ca.pem ]; do sleep 2; done"
-      echo "Certificates found:"
-      ls -la /certs/client/
-  services:
-    - name: docker:dind
-      alias: docker
+  variables:
+    DOCKER_HOST: unix:///var/run/docker.sock
   script:
     - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA -t $CI_REGISTRY_IMAGE:latest .
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
