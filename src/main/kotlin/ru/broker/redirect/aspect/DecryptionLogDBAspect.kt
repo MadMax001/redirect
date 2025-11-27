@@ -23,7 +23,7 @@ class DecryptionLogDBAspect(
     /**
      * Прокси-обертка вокруг метода расшифровки ссылки
      */
-    @Around("@annotation(ru.broker.redirect.aspect.DecryptionLogDB)")
+    @Around("@annotation(ru.broker.redirect.aspect.DecryptionLogDB) && execution(String *(..))")
     fun decryptUrlAroundWorker(joinPoint: ProceedingJoinPoint): Any {
         val result = try {
             joinPoint.proceed()
