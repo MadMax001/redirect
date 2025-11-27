@@ -41,7 +41,7 @@ test:
     - build
 
 docker-build:
-  stage: build
+  stage: docker-build
   image: docker:24.0
   services:
     - docker:24.0-dind
