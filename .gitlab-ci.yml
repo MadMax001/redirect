@@ -2,6 +2,12 @@ variables:
   DOCKER_HOST: tcp://docker:2376
   DOCKER_TLS_CERTDIR: "/certs"
 
+stages:
+  - build
+  - test
+  - docker-build
+
+
 image: gradle:8.14-jdk21-alpine
 
 before_script:
