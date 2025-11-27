@@ -34,7 +34,7 @@ test:
   artifacts:
     when: always
     paths:
-      - builds/broker/redirect/build/reports/tests/
+      - build/reports/tests/
     expire_in: 1 hour
   cache:
     key: "$CI_COMMIT_REF_NAME"
