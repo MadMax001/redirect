@@ -30,6 +30,9 @@ build:
 
 test:
   stage: test
+  services:
+    - name: docker:dind
+      alias: docker
   script: gradle check
   artifacts:
     when: always
