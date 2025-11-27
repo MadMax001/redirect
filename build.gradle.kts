@@ -42,9 +42,6 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-test {
-    systemProperty "testcontainers.docker.host", "tcp://docker:2375"
-}
 kotlin {
 	compilerOptions {
 		freeCompilerArgs.addAll("-Xjsr305=strict")
@@ -52,5 +49,6 @@ kotlin {
 }
 
 tasks.withType<Test> {
+    systemProperty "testcontainers.docker.host", "tcp://docker:2375"
     useJUnitPlatform()
 }
