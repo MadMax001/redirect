@@ -32,13 +32,13 @@ test:
   stage: test
   services:
   - name: docker:dind
-    command: ["--tls=false"]
+    command: ["--tls=true"]
   variables:
-    DOCKER_HOST: "tcp://docker:2375"
-    DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
     DOCKER_DRIVER: overlay2
-  before_script:
-    - apk add --no-cache docker docker-compose
+  # before_script:
+  #   - apk add --no-cache docker docker-compose
   script: gradle check
   artifacts:
     when: always
