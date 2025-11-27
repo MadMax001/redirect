@@ -30,8 +30,8 @@ import java.util.stream.Stream
 @Import(TestcontainersConfiguration::class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class RedirectDevIT {
-    val validUrl = "https://newurl.ru"
-    val errorUrl = "https://example.com/error"
+
+
     val validPath = "/v1/redirect"
 
     @Autowired
@@ -89,7 +89,7 @@ class RedirectDevIT {
         val p1 = "fekMZOmH8vj83IiKYWG7fnbLBUIi1IHxVu_KoTu_l7T8"
         val p2 = "znsaIe2lTiz3zuGS"
         val p3 = UUID.randomUUID().toString()
-        val expectedUrl = errorUrl
+        val expectedUrl = ERROR_URL
 
         mockMvc.perform(
             MockMvcRequestBuilders
@@ -112,28 +112,30 @@ class RedirectDevIT {
     }
 
     companion object {
+        const val VALID_URL = "https://newurl.ru"
+        const val ERROR_URL = "https://example.com/error"
 
         @JvmStatic
         fun getNormalCases() : Stream<Arguments> {
             return Stream.of(
                 Arguments.arguments(
                     "fekMZOmH8vj83IiKYWG7fnbLBUIi1IHxVu_KoTu_l7T8",
-                    "znsaIe2lTiz3zuGS", UUID.randomUUID().toString(), validUrl
+                    "znsaIe2lTiz3zuGS", UUID.randomUUID().toString(), VALID_URL
                 ),
                 //iv param p2 is wrong
                 Arguments.arguments(
                     "fekMZOmH8vj83IiKYWG7fnbLBUIi1IHxVu_KoTu_l7T8",
-                    "AAA", UUID.randomUUID().toString(), errorUrl
+                    "AAA", UUID.randomUUID().toString(), ERROR_URL
                 ),
                 //encrypted param p1 is wrong
                 Arguments.arguments(
                     "BBB",
-                    "znsaIe2lTiz3zuGS", UUID.randomUUID().toString(), errorUrl
+                    "znsaIe2lTiz3zuGS", UUID.randomUUID().toString(), ERROR_URL
                 ),
                 //encrypted param p1 and iv param p2 are wrong
                 Arguments.arguments(
                     "BBB",
-                    "AAA", UUID.randomUUID().toString(), errorUrl
+                    "AAA", UUID.randomUUID().toString(), ERROR_URL
                 )
             )
         }
@@ -144,12 +146,12 @@ class RedirectDevIT {
                 //requestId is null
                 Arguments.arguments(
                     "fekMZOmH8vj83IiKYWG7fnbLBUIi1IHxVu_KoTu_l7T8",
-                    "znsaIe2lTiz3zuGS", null, validUrl
+                    "znsaIe2lTiz3zuGS", null, VALID_URL
                 ),
                 //requestId is not UUID
                 Arguments.arguments(
                     "fekMZOmH8vj83IiKYWG7fnbLBUIi1IHxVu_KoTu_l7T8",
-                    "znsaIe2lTiz3zuGS", "aaaa-bbbb-cccc-dddd",  validUrl,
+                    "znsaIe2lTiz3zuGS", "aaaa-bbbb-cccc-dddd",  VALID_URL,
                 )
             )
         }
