@@ -49,6 +49,6 @@ kotlin {
 }
 
 tasks.withType<Test> {
-    systemProperty "testcontainers.docker.host", "tcp://docker:2375"
+	systemProperty("testcontainers.docker.host", "tcp://docker:2375")
     useJUnitPlatform()
 }
