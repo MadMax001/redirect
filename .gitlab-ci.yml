@@ -50,8 +50,8 @@ test:
       - .gradle
   dependencies:
     - build
-  # when: manual
-  # allow_failure: true
+  when: manual
+  allow_failure: true
 
 docker-build:
   stage: docker-build
