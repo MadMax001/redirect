@@ -61,6 +61,12 @@ test:
 docker-build:
   stage: docker-build
   image: docker:dind
+  before_script:
+    - |
+      echo "Waiting for Docker dind to generate certificates..."
+      timeout 120 sh -c "until [ -f /certs/client/ca.pem ]; do sleep 2; done"
+      echo "Certificates found:"
+      ls -la /certs/client/
   services:
     - name: docker:dind
       alias: docker
