@@ -1,0 +1,40 @@
+spring:
+  profiles:
+    active: ${APP_PROFILE}
+  application:
+    name: redirect
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:redirect}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+redirect:
+  errorUrl: https://platformrp.ru
+secrets:
+  encryptionKey: ${ENCRYPTION_KEY}
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: '*'
+  metrics.export.prometheus.enabled: true

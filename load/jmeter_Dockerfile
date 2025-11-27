@@ -1,0 +1,8 @@
+FROM justb4/jmeter:5.5
+
+RUN mkdir -p /load
+WORKDIR /load
+
+COPY load/jmeter/user.properties /opt/apache-jmeter-5.5/bin/
+
+CMD ["-n", "-t", "/load/loadTestPlan.jmx", "-l", "/load/results/results.jtl"]

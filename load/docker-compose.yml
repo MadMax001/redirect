@@ -1,0 +1,88 @@
+version: "3.9"
+services:
+  redirect-db:
+    container_name: redirect-db
+    image: postgres:latest
+    env_file:
+      - ".env"
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    # для логирования с уровнем debug
+    command: ["postgres", "-c", "log_min_messages=debug", "-c", "log_statement=all"]
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    expose:
+      - ${DB_PORT:-5432}
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+    restart: unless-stopped
+    networks:
+      - load
+
+  redirect-pgadmin:
+    container_name: redirect-pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: redirector@mail.com
+      PGADMIN_DEFAULT_PASSWORD: 12345
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+    networks:
+      - load
+
+  redirect-app:
+    container_name: redirect-app
+    env_file:
+      - ".env"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${SERVICE_PORT}:${SERVICE_PORT}"
+    depends_on:
+      redirect-db:
+        condition: service_healthy
+    volumes:
+      - gradle_cache:/home/.gradle
+    networks:
+      - load
+
+  jmeter:
+    container_name: redirect-jmeter
+    build:
+      context: .
+      dockerfile: jmeter_Dockerfile
+    volumes:
+      - ./load:/load
+    depends_on:
+      redirect-db:
+        condition: service_healthy
+    tty: true
+    networks:
+      - load
+
+volumes:
+    pgadmin-data:
+    gradle_cache:
+
+networks:
+  load:
+    driver: bridge
