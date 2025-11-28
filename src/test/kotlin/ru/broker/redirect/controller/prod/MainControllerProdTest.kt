@@ -1,6 +1,7 @@
 package ru.broker.redirect.controller.prod
 
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -15,7 +16,7 @@ import java.util.UUID
 
 @ActiveProfiles("prod")
 @WebMvcTest(controllers = [MainControllerProd::class])
-class MainControllerProdTest {
+class  MainControllerProdTest {
     private val errorUrl = "https://example.com/error"
     private val path = "/v1/redirect"
 
@@ -29,8 +30,7 @@ class MainControllerProdTest {
     fun requestForRedirectTest() {
         val expected = "https://example.com/success"
         val gpbId = UUID.randomUUID().toString()
-        `when`(redirector.buildRedirectUrl("a", "b", gpbId))
-            .thenReturn(expected)
+        `when`(redirector.buildRedirectUrl(any())).thenReturn(expected)
 
         mockMvc.perform(get(path)
             .param("p2", "b")
@@ -43,7 +43,7 @@ class MainControllerProdTest {
     @Test
     fun requestForRedirectThrowsExceptionTest() {
         val gpbId = UUID.randomUUID().toString()
-        `when`(redirector.buildRedirectUrl("a", "b", gpbId))
+        `when`(redirector.buildRedirectUrl(any()))
             .thenThrow(RuntimeException("Что-то пошло не так"))
 
         mockMvc.perform(get(path)
@@ -58,8 +58,7 @@ class MainControllerProdTest {
     fun redirectProcessReturnEmptyUrlForRedirectionTest() {
         val gpbId = UUID.randomUUID().toString()
         val error = RuntimeException("[$gpbId]. Не удалось расшифровать ссылку")
-        `when`(redirector.buildRedirectUrl(null, null, gpbId))
-            .thenThrow(error)
+        `when`(redirector.buildRedirectUrl(any())).thenThrow(error)
 
         mockMvc.perform(get(path)
             .param("p3", gpbId))

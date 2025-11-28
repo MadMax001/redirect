@@ -4,5 +4,7 @@ import java.util.UUID
 
 data class Request (
   val url: String,
-  val requestId: UUID?
+  val gpbId: UUID?,
+  val clientIP: String?,
+  val clientAgent: String?
 )

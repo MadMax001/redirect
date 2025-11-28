@@ -30,9 +30,7 @@ import java.util.stream.Stream
 @Import(TestcontainersConfiguration::class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class RedirectDevIT {
-
-
-    val validPath = "/v1/redirect"
+    private val validPath = "/v1/redirect"
 
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -53,7 +51,7 @@ class RedirectDevIT {
             .param("p3", p3))
             .andReturn()
 
-        val sql = "SELECT count(*) FROM request WHERE url = :url AND request_id = :id"
+        val sql = "SELECT count(*) FROM request WHERE url = :url AND gpb_id = :id"
         val id = UUID.fromString(p3)
         val params = MapSqlParameterSource().addValues(
             mapOf("url" to expectedUrl, "id" to id))
@@ -75,7 +73,7 @@ class RedirectDevIT {
             .param("p3", p3))
             .andReturn()
 
-        val sql = "SELECT count(*) FROM request WHERE url = :url AND request_id IS NULL"
+        val sql = "SELECT count(*) FROM request WHERE url = :url AND gpb_id IS NULL"
         val params = MapSqlParameterSource().addValues(
             mapOf("url" to expectedUrl))
         Thread.sleep(500)
@@ -103,7 +101,7 @@ class RedirectDevIT {
                         "Запрос на несуществующий адрес. Перенаправление на $expectedUrl"
                     )
                 ))
-        val sql = "SELECT count(*) FROM request WHERE url = :url AND request_id IS NULL"
+        val sql = "SELECT count(*) FROM request WHERE url = :url AND gpb_id IS NULL"
         val params = MapSqlParameterSource().addValues(
             mapOf("url" to expectedUrl))
         Thread.sleep(500)
@@ -116,7 +114,7 @@ class RedirectDevIT {
         const val ERROR_URL = "https://example.com/error"
 
         @JvmStatic
-        fun getNormalCases() : Stream<Arguments> {
+        private fun getNormalCases() : Stream<Arguments> {
             return Stream.of(
                 Arguments.arguments(
                     "fekMZOmH8vj83IiKYWG7fnbLBUIi1IHxVu_KoTu_l7T8",

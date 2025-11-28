@@ -1,5 +1,6 @@
 package ru.broker.redirect.service
 
+import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import ru.broker.redirect.aspect.DecryptionLogDB
@@ -14,17 +15,21 @@ class Redirector (private val encryptor: SymmetricEncryptor) {
 
     /**
      * Расшифровать ссылку. Если ссылку расшифровать не удается, то возникает RuntimeException
-     * @param encryptedUrl - ссылка в зашифрованном виде
-     * @param iv - инициализационный вектор, используется для расшифровки
-     * @param gpbIdString - строковое представление внешнего идентификатора запроса от ГПБ
+     * request - объект HttpServletRequest. Ожидается, что данная функция обрабатывает запросы, содержащие 3 параметра:
+     * p1 - ссылка в зашифрованном виде
+     * p2 - инициализационный вектор, используется для расшифровки
+     * p3 - строковое представление внешнего идентификатора запроса от ГПБ
      */
     @DecryptionLogDB
-    fun buildRedirectUrl(encryptedUrl: String?, iv: String?, gpbIdString: String?) : String {
+    fun buildRedirectUrl(request: HttpServletRequest?) : String {
+        val encryptedUrl : String? = request?.getParameter("p1")
+        val iv : String? = request?.getParameter("p2")
+        val gpbIdString : String? = request?.getParameter("p3")
         logger.info("[$gpbIdString]. Запрос на перенаправление")
         val gpbId = safeBuildUUID(gpbIdString)
         val redirectUrl = encryptor.decryptUrl(encryptedUrl, iv)
             ?: throw RuntimeException("[$gpbId]. Не удалось расшифровать ссылку")
-        logger.info("[$gpbId]. Ссылка на на $redirectUrl")
+        logger.info("[$gpbIdString]. Ссылка на $redirectUrl")
         return redirectUrl
     }
 

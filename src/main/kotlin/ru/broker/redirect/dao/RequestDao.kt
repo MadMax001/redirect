@@ -24,17 +24,19 @@ class RequestDao(
     @Transactional
     @Async("taskExecutor")
     fun save(request: Request): CompletableFuture<UUID?> {
-        val sql = "INSERT INTO request (url, request_id) VALUES (:url, :requestId) RETURNING id"
+        val sql = "INSERT INTO request (url, gpb_id, client_ip, client_agent) VALUES (:url, :gpbId, :clientId, :clientAgent) RETURNING id"
         val keyHolder = GeneratedKeyHolder()
         val params = MapSqlParameterSource()
             .addValue("url", request.url)
-            .addValue("requestId", request.requestId)
+            .addValue("gpbId", request.gpbId)
+            .addValue("clientId", request.clientIP)
+            .addValue("clientAgent", request.clientAgent)
 
         jdbcTemplate.update(sql, params, keyHolder)
         val id = keyHolder.keys?.get("id") as UUID
         return CompletableFuture.completedFuture<UUID?>(id)
             .thenApply{ id ->
-                logger.debug("Запись для [{}] сохранена в БД: {}", request.requestId, id)
+                logger.debug("Запись для [{}] сохранена в БД: {}", request.gpbId, id)
                 id
             }
     }

@@ -41,7 +41,7 @@ class GlobalExceptionHandlerProdTest {
     @Test
     fun anyExceptionInProcessLeadsToDefaultRedirectTest() {
         val error = RuntimeException("Что-то пошло не так")
-        `when`(redirector.buildRedirectUrl(Mockito.any(), Mockito.any(), Mockito.any()))
+        `when`(redirector.buildRedirectUrl(Mockito.any()))
             .thenThrow(error)
 
         mockMvc.perform(get("/v1/redirect"))

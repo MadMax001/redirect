@@ -6,13 +6,15 @@ plugins {
 }
 
 val majorVersion = "0"
-val minorVersion = "2"
+val minorVersion = "3"
 val patchVersion = "0"
 val isSnapshot = true
 
 group = "ru.broker"
 version = "$majorVersion.$minorVersion.$patchVersion${if (isSnapshot) "-SNAPSHOT" else ""}"
 description = "Client redirector"
+
+val mockitoKotlinVersion = "5.4.0"			//https://github.com/mockito/mockito-kotlin
 
 java {
 	toolchain {
@@ -39,6 +41,7 @@ dependencies {
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("org.testcontainers:junit-jupiter")
 	testImplementation("org.testcontainers:postgresql")
+	testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
