@@ -1,5 +1,6 @@
 package ru.broker.redirect.aspect
 
+import jakarta.servlet.http.HttpServletRequest
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
@@ -19,6 +20,7 @@ class DecryptionLogDBAspect(
     private val dao: RequestDao,
     @Value("\${redirect.errorUrl}") private val errorUrl: String
 ) {
+    private val gpbIdRequestParamName = "p3"
 
     /**
      * Прокси-обертка вокруг метода расшифровки ссылки
@@ -30,26 +32,59 @@ class DecryptionLogDBAspect(
         } catch (ignore: RuntimeException) {
             null
         }
-        val args = joinPoint.args
         val url = result as? String ?: errorUrl
+        val args = joinPoint.args
         logInDb(args, url)
         return url
     }
 
     private fun logInDb(args: Array<Any>, url: String) {
-        val requestId = extractBrokerIdArgs(args)
-        val request = Request(url, requestId)
+        val httpRequest = extractHttRequest(args)
+        val request = buildRequest(httpRequest, url)
         dao.save(request)
     }
 
-    private fun extractBrokerIdArgs(args: Array<Any>): UUID? {
-        return if (args.size == 3 && args[2] is String)
+    private fun buildRequest(httpRequest: HttpServletRequest?, url: String): Request {
+        val requestId = fetchGpbId(httpRequest)
+        val clientIp = fetchClientIp(httpRequest)
+        val clientAgent = fetchClientAgent(httpRequest)
+        return Request(url, requestId, clientIp, clientAgent)
+    }
+
+    private fun extractHttRequest(args: Array<Any>): HttpServletRequest? {
+        return if (args.isNotEmpty() && args[0] is HttpServletRequest) args[0] as HttpServletRequest else null
+    }
+
+    private fun fetchGpbId(httpRequest: HttpServletRequest?): UUID? {
+        return httpRequest?.getParameter(gpbIdRequestParamName)?.let {
             try {
-                UUID.fromString(args[2] as String)
+                UUID.fromString(it)
             } catch (_: IllegalArgumentException) {
                 null
             }
-        else
-            null
+        }
     }
+
+    private fun fetchClientIp(httpRequest: HttpServletRequest?): String? {
+        var clientIp = httpRequest?.remoteAddr
+        if (clientIp.isNullOrEmpty()) {
+            clientIp = fetchHeaderByName(httpRequest, "X-Forwarded-For")
+            if (clientIp.isNullOrEmpty())
+                return fetchHeaderByName(httpRequest, "X-Real-IP")
+        }
+        return clientIp
+    }
+
+    private fun fetchClientAgent(httpRequest: HttpServletRequest?): String? {
+        return fetchWholeHeaderByName(httpRequest, "User-Agent")
+    }
+
+    private fun fetchHeaderByName (httpRequest: HttpServletRequest?, header: String): String? {
+        return fetchWholeHeaderByName(httpRequest, header)?.split(",")?.first()
+    }
+
+    private fun fetchWholeHeaderByName (httpRequest: HttpServletRequest?, header: String): String? {
+        return httpRequest?.getHeader(header)
+    }
+
 }

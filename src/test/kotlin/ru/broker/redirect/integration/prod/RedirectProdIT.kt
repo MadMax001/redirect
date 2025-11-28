@@ -30,7 +30,7 @@ import java.util.stream.Stream
 @Import(TestcontainersConfiguration::class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class RedirectProdIT {
-    val validPath = "/v1/redirect"
+    private val validPath = "/v1/redirect"
 
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -51,7 +51,7 @@ class RedirectProdIT {
             .param("p3", p3))
             .andReturn()
 
-        val sql = "SELECT count(*) FROM request WHERE url = :url AND request_id = :id"
+        val sql = "SELECT count(*) FROM request WHERE url = :url AND gpb_id = :id"
         val id = UUID.fromString(p3)
         val params = MapSqlParameterSource().addValues(
             mapOf("url" to expectedUrl, "id" to id))
@@ -73,7 +73,7 @@ class RedirectProdIT {
             .param("p3", p3))
             .andReturn()
 
-        val sql = "SELECT count(*) FROM request WHERE url = :url AND request_id IS NULL"
+        val sql = "SELECT count(*) FROM request WHERE url = :url AND gpb_id IS NULL"
         val params = MapSqlParameterSource().addValues(
             mapOf("url" to expectedUrl))
         Thread.sleep(500)
@@ -98,7 +98,7 @@ class RedirectProdIT {
             .andExpect(status().is3xxRedirection)
             .andExpect(redirectedUrl(expectedUrl))
 
-        val sql = "SELECT count(*) FROM request WHERE url = :url AND request_id IS NULL"
+        val sql = "SELECT count(*) FROM request WHERE url = :url AND gpb_id IS NULL"
         val params = MapSqlParameterSource().addValues(
             mapOf("url" to expectedUrl))
         Thread.sleep(500)
@@ -111,7 +111,7 @@ class RedirectProdIT {
         const val ERROR_URL = "https://example.com/error"
 
         @JvmStatic
-        fun getNormalCases() : Stream<Arguments> {
+        private fun getNormalCases() : Stream<Arguments> {
             return Stream.of(
                 Arguments.arguments(
                     "fekMZOmH8vj83IiKYWG7fnbLBUIi1IHxVu_KoTu_l7T8",
@@ -136,7 +136,7 @@ class RedirectProdIT {
         }
 
         @JvmStatic
-        fun getAbnormalCases() : Stream<Arguments> {
+        private fun getAbnormalCases() : Stream<Arguments> {
             return Stream.of(
                 //requestId is null
                 Arguments.arguments(
