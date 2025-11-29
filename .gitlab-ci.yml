@@ -7,7 +7,7 @@
 
 variables:
   DOCKER_HOST: unix:///var/run/docker.sock
-  CI_REGISTRY_IMAGE: redirect
+  CI_REGISTRY_IMAGE: "${CI_PROJECT_PATH}"
   
 stages:
   - build
@@ -69,5 +69,3 @@ docker-build:
   #  - test
   only:
     - main
-    - master
-    - develop
