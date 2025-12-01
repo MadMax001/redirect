@@ -32,8 +32,7 @@ class RequestDaoTest {
         val clientAgent = "client-agent"
         val request = Request(url, gpbId, clientIp, clientAgent)
 
-        val idFuture = requestDao.save(request)
-        val id = idFuture.get()
+        val id = requestDao.save(request)
 
         assertThat(id).isNotNull()
 

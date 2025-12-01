@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.mockito.Mockito
-import org.mockito.Mockito.`when`
+import org.mockito.kotlin.whenever
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
@@ -41,7 +41,7 @@ class GlobalExceptionHandlerProdTest {
     @Test
     fun anyExceptionInProcessLeadsToDefaultRedirectTest() {
         val error = RuntimeException("Что-то пошло не так")
-        `when`(redirector.buildRedirectUrl(Mockito.any()))
+        whenever(redirector.buildRedirectUrl(Mockito.any()))
             .thenThrow(error)
 
         mockMvc.perform(get("/v1/redirect"))
