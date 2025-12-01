@@ -6,7 +6,7 @@ plugins {
 }
 
 val majorVersion = "0"
-val minorVersion = "3"
+val minorVersion = "4"
 val patchVersion = "0"
 val isSnapshot = true
 
