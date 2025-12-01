@@ -6,8 +6,8 @@ import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import ru.broker.redirect.dao.RequestDao
 import ru.broker.redirect.model.Request
+import ru.broker.redirect.service.DBHandler
 import java.util.UUID
 
 /**
@@ -17,7 +17,7 @@ import java.util.UUID
 @Component
 @Suppress("unused")
 class DecryptionLogDBAspect(
-    private val dao: RequestDao,
+    private val dbHandler: DBHandler,
     @Value("\${redirect.errorUrl}") private val errorUrl: String
 ) {
     private val gpbIdRequestParamName = "p3"
@@ -41,7 +41,7 @@ class DecryptionLogDBAspect(
     private fun logInDb(args: Array<Any>, url: String) {
         val httpRequest = extractHttRequest(args)
         val request = buildRequest(httpRequest, url)
-        dao.save(request)
+        dbHandler.saveRequest(request)
     }
 
     private fun buildRequest(httpRequest: HttpServletRequest?, url: String): Request {

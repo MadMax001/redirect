@@ -8,8 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers.any
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.whenever
 import org.springframework.boot.test.system.CapturedOutput
 import org.springframework.boot.test.system.OutputCaptureExtension
 import java.util.UUID
@@ -31,7 +31,7 @@ class RedirectorTest {
 
     @Test
     fun buildRedirectUrlTest(capturedOutput: CapturedOutput) {
-        `when`(encryptor.decryptUrl(any(), any())).thenReturn(decryptedUrl)
+        whenever(encryptor.decryptUrl(any(), any())).thenReturn(decryptedUrl)
         val gpbId = UUID.randomUUID().toString()
         val httpRequest = buildHttpRequest(gpbId)
 
@@ -48,7 +48,7 @@ class RedirectorTest {
     @Test
     fun buildRedirectUrlThrowsExceptionTest(capturedOutput: CapturedOutput) {
         val error = RuntimeException(errorText)
-        `when`(encryptor.decryptUrl(any(), any())).thenThrow(error)
+        whenever(encryptor.decryptUrl(any(), any())).thenThrow(error)
         val gpbId = UUID.randomUUID().toString()
         val httpRequest = buildHttpRequest(gpbId)
 
@@ -64,7 +64,7 @@ class RedirectorTest {
 
     @Test
     fun buildRedirectUrlReturnsNullTest(capturedOutput: CapturedOutput) {
-        `when`(encryptor.decryptUrl(any(), any())).thenReturn(null)
+        whenever(encryptor.decryptUrl(any(), any())).thenReturn(null)
         val gpbId = UUID.randomUUID().toString()
         val httpRequest = buildHttpRequest(gpbId)
 
@@ -80,7 +80,7 @@ class RedirectorTest {
 
     @Test
     fun wrongGpbIdTest(capturedOutput: CapturedOutput) {
-        `when`(encryptor.decryptUrl(any(), any())).thenReturn(decryptedUrl)
+        whenever(encryptor.decryptUrl(any(), any())).thenReturn(decryptedUrl)
         val incorrectGpbId = "sdsfskdjgldfkgjsdlfg"
         val httpRequest = buildHttpRequest(incorrectGpbId)
 
@@ -96,7 +96,7 @@ class RedirectorTest {
 
     @Test
     fun emptyGpbIdTest(capturedOutput: CapturedOutput) {
-        `when`(encryptor.decryptUrl(any(), any())).thenReturn(decryptedUrl)
+        whenever(encryptor.decryptUrl(any(), any())).thenReturn(decryptedUrl)
         val httpRequest = buildHttpRequest(null)
 
         val url = redirector.buildRedirectUrl(httpRequest)
@@ -111,10 +111,10 @@ class RedirectorTest {
 
 
     private fun buildHttpRequest(gpbId: String?): HttpServletRequest {
-        `when`(mockRequest.getParameter("p1")).thenReturn("a")
-        `when`(mockRequest.getParameter("p2")).thenReturn("b")
+        whenever(mockRequest.getParameter("p1")).thenReturn("a")
+        whenever(mockRequest.getParameter("p2")).thenReturn("b")
         gpbId?.run {
-            `when`(mockRequest.getParameter("p3")).thenReturn(gpbId)
+            whenever(mockRequest.getParameter("p3")).thenReturn(gpbId)
         }
         return mockRequest
     }

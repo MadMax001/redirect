@@ -3,7 +3,7 @@ package ru.broker.redirect.controller.dev
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.`when`
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.test.context.ActiveProfiles
@@ -29,7 +29,7 @@ class MainControllerDevTest {
     fun requestForRedirectTest() {
         val expected = "https://example.com/success"
         val gpbId = UUID.randomUUID().toString()
-        `when`(redirector.buildRedirectUrl(any()))
+        whenever(redirector.buildRedirectUrl(any()))
             .thenReturn(expected)
 
         mockMvc.perform(
@@ -46,7 +46,7 @@ class MainControllerDevTest {
     @Test
     fun requestForRedirectThrowsExceptionTest() {
         val gpbId = UUID.randomUUID().toString()
-        `when`(redirector.buildRedirectUrl(any()))
+        whenever(redirector.buildRedirectUrl(any()))
             .thenThrow(RuntimeException("Что-то пошло не так"))
 
         mockMvc.perform(
@@ -67,7 +67,7 @@ class MainControllerDevTest {
     fun redirectProcessReturnEmptyUrlForRedirectionTest() {
         val gpbId = UUID.randomUUID().toString()
         val error = RuntimeException("[$gpbId]. Не удалось расшифровать ссылку")
-        `when`(redirector.buildRedirectUrl(any()))
+        whenever(redirector.buildRedirectUrl(any()))
             .thenThrow(error)
 
         mockMvc.perform(
