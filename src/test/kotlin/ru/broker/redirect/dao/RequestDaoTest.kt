@@ -25,7 +25,7 @@ class RequestDaoTest {
     private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @Test
-    fun saveReqeustTest() {
+    fun saveRequestTest() {
         val url = "http://example.com"
         val gpbId = UUID.randomUUID()
         val clientIp = "10.20.30.40"
@@ -48,5 +48,17 @@ class RequestDaoTest {
         assertThat(savedRequest["client_ip"]).isEqualTo(clientIp)
         assertThat(savedRequest["client_agent"]).isEqualTo(clientAgent)
 
+    }
+
+    @Test
+    fun saveRequestTwiceWithSameGpbIdTest() {
+        val gpbId = UUID.randomUUID()
+        val request1 = Request("url", gpbId, "clientIp", "clientAgent")
+        val request2 = request1.copy(clientIP = "clientIp2")
+        requestDao.save(request1)
+
+        val id = requestDao.save(request2)
+
+        assertThat(id).isNotNull()
     }
 }
