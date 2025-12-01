@@ -15,6 +15,7 @@ import org.mockito.kotlin.verify
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.whenever
+import ru.broker.redirect.TestConstants.Companion.ERROR_TEXT
 import ru.broker.redirect.model.Request
 import ru.broker.redirect.service.DBHandler
 import java.util.UUID
@@ -84,7 +85,7 @@ class DecryptionLogDBAspectTest {
     @Test
     fun errorInDecryptionProcessTest() {
         val expected = Request(errorUrl, gpbId, clientIp, clientAgent)
-        val error = RuntimeException("Что-то пошло не так")
+        val error = RuntimeException(ERROR_TEXT)
         whenever(joinPoint.proceed()).thenThrow(error)
         val httpRequest = buildHttpRequest(
             gpbIdStr, clientIp, null, null, clientAgent)

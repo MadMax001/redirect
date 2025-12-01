@@ -3,6 +3,8 @@ package ru.broker.redirect.service
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
+import ru.broker.redirect.config.Constants.Companion.LOG_ERROR_DB_SAVE
+import ru.broker.redirect.config.Constants.Companion.LOG_SUCCESS_DB_SAVE
 import ru.broker.redirect.dao.RequestDao
 import ru.broker.redirect.model.Request
 import java.util.UUID
@@ -28,10 +30,10 @@ class DBHandler (
     fun saveRequest(request: Request): CompletableFuture<UUID?> {
         return CompletableFuture.supplyAsync( {requestDao.save(request)}, taskExecutor)
             .thenApply{ id ->
-                logger.info("[{}]. Запись для сохранена в БД: {}", request.gpbId, id)
+                logger.info("[{}]. $LOG_SUCCESS_DB_SAVE: {}", request.gpbId, id)
                 id
             }.exceptionally { error ->
-                logger.error("[{}]. Ошибка при записи в БД. ", request.gpbId, error)
+                logger.error("[{}]. $LOG_ERROR_DB_SAVE. ", request.gpbId, error)
                 throw error
             }
     }

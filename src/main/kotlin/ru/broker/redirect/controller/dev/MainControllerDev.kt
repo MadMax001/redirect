@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import ru.broker.redirect.config.Constants
 import ru.broker.redirect.service.Redirector
 
 @RestController
@@ -26,9 +27,8 @@ class MainControllerDev(
     @GetMapping("/redirect")
     fun handleRedirect(request: HttpServletRequest): String {
         val redirectUrl = redirector.buildRedirectUrl(request)
-        val message = "[${request.getParameter("p3")}]. Перенаправление на $redirectUrl"
+        val message = "[${request.getParameter("p3")}]. ${Constants.Companion.LOG_SUCCESS_REDIRECT} $redirectUrl"
         return message
     }
 
 }
-

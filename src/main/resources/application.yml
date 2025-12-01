@@ -5,8 +5,6 @@ spring:
     name: redirect
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
-  mvc:
-    throw-exception-if-no-handler-found: true
   web:
     resources:
       add-mappings: false
@@ -20,6 +18,10 @@ spring:
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
+  security:
+    user:
+      name: ${APP_USER}
+      password: ${APP_PASSWORD}
 redirect:
   errorUrl: https://platformrp.ru
 secrets:
@@ -34,7 +36,8 @@ management:
       enabled: true
   endpoints:
     web:
-      base-path: /actuator
+      base-path: /e67d4c74-dfcd-4c24-94f9-7540d4d07f3b
+      path-mapping:
+        health: /check
       exposure:
-        include: '*'
-  metrics.export.prometheus.enabled: true
+        include: health

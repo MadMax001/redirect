@@ -2,3 +2,8 @@ secrets:
   encryptionKey: secret-key-12345
 redirect:
   errorUrl: https://example.com/error
+spring:
+  security:
+    user:
+      name: dev-user
+      password: dev-password

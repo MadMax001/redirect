@@ -12,14 +12,15 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import org.springframework.boot.test.system.CapturedOutput
 import org.springframework.boot.test.system.OutputCaptureExtension
+import ru.broker.redirect.TestConstants.Companion.ERROR_TEXT
+import ru.broker.redirect.config.Constants.Companion.DECRYPTION_ERROR_TEXT
+import ru.broker.redirect.config.Constants.Companion.FINISH_REDIRECT_PROCESS
+import ru.broker.redirect.config.Constants.Companion.START_REDIRECT_PROCESS
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class, OutputCaptureExtension::class)
 class RedirectorTest {
     private val decryptedUrl = "https://decrypted.ru"
-    private val firstLogPart = "Запрос на перенаправление"
-    private val lastLogPart = "Ссылка на"
-    private val errorText = "Что-то пошло не так"
     @Mock
     private lateinit var encryptor: SymmetricEncryptor
 
@@ -39,27 +40,27 @@ class RedirectorTest {
 
         assertThat(url).isEqualTo(decryptedUrl)
         assertThat(capturedOutput.all)
-            .contains(firstLogPart)
-            .contains(lastLogPart)
+            .contains(START_REDIRECT_PROCESS)
+            .contains(FINISH_REDIRECT_PROCESS)
             .contains(gpbId)
             .contains(decryptedUrl)
     }
 
     @Test
     fun buildRedirectUrlThrowsExceptionTest(capturedOutput: CapturedOutput) {
-        val error = RuntimeException(errorText)
+        val error = RuntimeException(ERROR_TEXT)
         whenever(encryptor.decryptUrl(any(), any())).thenThrow(error)
         val gpbId = UUID.randomUUID().toString()
         val httpRequest = buildHttpRequest(gpbId)
 
         assertThatThrownBy{ redirector.buildRedirectUrl(httpRequest) }
             .isExactlyInstanceOf(RuntimeException::class.java)
-            .hasMessageContaining(errorText)
+            .hasMessageContaining(ERROR_TEXT)
 
         assertThat(capturedOutput.all)
-            .contains(firstLogPart)
+            .contains(START_REDIRECT_PROCESS)
             .contains(gpbId)
-            .doesNotContain(lastLogPart)
+            .doesNotContain(FINISH_REDIRECT_PROCESS)
     }
 
     @Test
@@ -70,12 +71,12 @@ class RedirectorTest {
 
         assertThatThrownBy{ redirector.buildRedirectUrl(httpRequest) }
             .isExactlyInstanceOf(RuntimeException::class.java)
-            .hasMessageContaining("Не удалось расшифровать ссылку")
+            .hasMessageContaining(DECRYPTION_ERROR_TEXT)
 
         assertThat(capturedOutput.all)
-            .contains(firstLogPart)
+            .contains(START_REDIRECT_PROCESS)
             .contains(gpbId)
-            .doesNotContain(lastLogPart)
+            .doesNotContain(FINISH_REDIRECT_PROCESS)
     }
 
     @Test
@@ -88,8 +89,8 @@ class RedirectorTest {
 
         assertThat(url).isEqualTo(decryptedUrl)
         assertThat(capturedOutput.all)
-            .contains(firstLogPart)
-            .contains(lastLogPart)
+            .contains(START_REDIRECT_PROCESS)
+            .contains(FINISH_REDIRECT_PROCESS)
             .contains(decryptedUrl)
             .contains(incorrectGpbId)
     }
@@ -103,8 +104,8 @@ class RedirectorTest {
 
         assertThat(url).isEqualTo(decryptedUrl)
         assertThat(capturedOutput.all)
-            .contains(firstLogPart)
-            .contains(lastLogPart)
+            .contains(START_REDIRECT_PROCESS)
+            .contains(FINISH_REDIRECT_PROCESS)
             .contains(decryptedUrl)
             .contains("[null]")
     }

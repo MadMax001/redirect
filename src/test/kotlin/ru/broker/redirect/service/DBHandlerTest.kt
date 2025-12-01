@@ -13,7 +13,10 @@ import org.springframework.boot.test.system.OutputCaptureExtension
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import ru.broker.redirect.TestConstants.Companion.ERROR_TEXT
 import ru.broker.redirect.config.AsyncConfiguration
+import ru.broker.redirect.config.Constants.Companion.LOG_ERROR_DB_SAVE
+import ru.broker.redirect.config.Constants.Companion.LOG_SUCCESS_DB_SAVE
 import ru.broker.redirect.dao.RequestDao
 import ru.broker.redirect.model.Request
 import java.util.UUID
@@ -21,8 +24,6 @@ import java.util.UUID
 @ExtendWith(SpringExtension::class, OutputCaptureExtension::class)
 @ContextConfiguration(classes = [DBHandler::class, AsyncConfiguration::class])
 class DBHandlerTest {
-    private val successRequestLog = "Запись для сохранена в БД"
-    private val errorRequestLog = "Ошибка при записи в БД"
 
     @MockitoBean
     private lateinit var requestDao: RequestDao
@@ -42,27 +43,26 @@ class DBHandlerTest {
         assertThat(id).isEqualTo(dbId)
 
         assertThat(capturedOutput.all)
-            .contains(successRequestLog)
+            .contains(LOG_SUCCESS_DB_SAVE)
             .contains(gpbId.toString())
             .contains(dbId.toString())
-            .doesNotContain(errorRequestLog)
+            .doesNotContain(LOG_ERROR_DB_SAVE)
     }
 
     @Test
     fun errorSaveRequestTest(capturedOutput: CapturedOutput) {
         val gpbId = UUID.randomUUID()
         val request = Request("url", gpbId, null, null)
-        val errorMessage = "Что-то пошло не так"
-        val error = RuntimeException(errorMessage)
+        val error = RuntimeException(ERROR_TEXT)
         doThrow(error).whenever(requestDao).save(any())
 
         val result = dbHandler.saveRequest(request)
 
         assertThatThrownBy{ result.get() }
-            .hasMessageContaining(errorMessage)
+            .hasMessageContaining(ERROR_TEXT)
         assertThat(capturedOutput.all)
-            .doesNotContain(successRequestLog)
-            .contains(errorRequestLog)
+            .doesNotContain(LOG_SUCCESS_DB_SAVE)
+            .contains(LOG_ERROR_DB_SAVE)
             .contains(gpbId.toString())
 
     }

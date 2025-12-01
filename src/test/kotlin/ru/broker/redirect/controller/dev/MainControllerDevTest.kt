@@ -2,23 +2,31 @@ package ru.broker.redirect.controller.dev
 
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import ru.broker.redirect.TestConstants
+import ru.broker.redirect.config.Constants
+import ru.broker.redirect.config.Constants.Companion.DEV_ERROR_ANSWER
+import ru.broker.redirect.config.SecurityConfiguration
+import ru.broker.redirect.config.SecurityDevConfiguration
 import ru.broker.redirect.service.Redirector
 import java.util.UUID
 
 @ActiveProfiles("dev")
 @WebMvcTest(controllers = [MainControllerDev::class])
+@Import(SecurityDevConfiguration::class, SecurityConfiguration::class)
 class MainControllerDevTest {
     private val errorUrl = "https://example.com/error"
     private val path = "/v1/redirect"
+
     @Autowired
     private lateinit var mockMvc: MockMvc
 
@@ -29,7 +37,7 @@ class MainControllerDevTest {
     fun requestForRedirectTest() {
         val expected = "https://example.com/success"
         val gpbId = UUID.randomUUID().toString()
-        whenever(redirector.buildRedirectUrl(any()))
+        whenever(redirector.buildRedirectUrl(ArgumentMatchers.any()))
             .thenReturn(expected)
 
         mockMvc.perform(
@@ -40,14 +48,14 @@ class MainControllerDevTest {
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(
                 MockMvcResultMatchers.content()
-                    .string(Matchers.containsString("[$gpbId]. Перенаправление на $expected")))
+                    .string(Matchers.containsString("[$gpbId]. ${Constants.Companion.LOG_SUCCESS_REDIRECT} $expected")))
     }
 
     @Test
     fun requestForRedirectThrowsExceptionTest() {
         val gpbId = UUID.randomUUID().toString()
-        whenever(redirector.buildRedirectUrl(any()))
-            .thenThrow(RuntimeException("Что-то пошло не так"))
+        whenever(redirector.buildRedirectUrl(ArgumentMatchers.any()))
+            .thenThrow(RuntimeException(TestConstants.Companion.ERROR_TEXT))
 
         mockMvc.perform(
             MockMvcRequestBuilders.get(path)
@@ -58,7 +66,7 @@ class MainControllerDevTest {
             .andExpect(
                 MockMvcResultMatchers.content().string(
                     Matchers.containsString(
-                        "Ошибка в процессе обработки. Перенаправление на $errorUrl"
+                        "$DEV_ERROR_ANSWER $errorUrl"
                     )
                 ))
     }
@@ -66,8 +74,8 @@ class MainControllerDevTest {
     @Test
     fun redirectProcessReturnEmptyUrlForRedirectionTest() {
         val gpbId = UUID.randomUUID().toString()
-        val error = RuntimeException("[$gpbId]. Не удалось расшифровать ссылку")
-        whenever(redirector.buildRedirectUrl(any()))
+        val error = RuntimeException("[$gpbId]. ${Constants.Companion.DECRYPTION_ERROR_TEXT}")
+        whenever(redirector.buildRedirectUrl(ArgumentMatchers.any()))
             .thenThrow(error)
 
         mockMvc.perform(
@@ -77,7 +85,7 @@ class MainControllerDevTest {
             .andExpect(
                 MockMvcResultMatchers.content().string(
                     Matchers.containsString(
-                        "Ошибка в процессе обработки. Перенаправление на $errorUrl"
+                        "$DEV_ERROR_ANSWER $errorUrl"
                     )
                 ))
     }

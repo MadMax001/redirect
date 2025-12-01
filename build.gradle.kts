@@ -6,7 +6,7 @@ plugins {
 }
 
 val majorVersion = "0"
-val minorVersion = "4"
+val minorVersion = "5"
 val patchVersion = "0"
 val isSnapshot = true
 
@@ -34,6 +34,7 @@ dependencies {
 	implementation("org.liquibase:liquibase-core")
 	implementation("org.springframework.boot:spring-boot-starter-aop")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("org.springframework.boot:spring-boot-starter-security")
 	runtimeOnly("org.postgresql:postgresql")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
