@@ -1,4 +1,4 @@
-package ru.broker.redirect.integration.dev
+package ru.broker.redirect.integration
 
 import org.assertj.core.api.Assertions
 import org.hamcrest.Matchers
@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import ru.broker.redirect.TestcontainersConfiguration
+import ru.broker.redirect.config.Constants.Companion.DEV_AUTHENTIFICATION_ERROR_ANSWER
 import java.util.UUID
 import java.util.stream.Stream
 
@@ -98,7 +99,7 @@ class RedirectDevIT {
             .andExpect(
                 MockMvcResultMatchers.content().string(
                     Matchers.containsString(
-                        "Запрос на несуществующий адрес. Перенаправление на $expectedUrl"
+                        "$DEV_AUTHENTIFICATION_ERROR_ANSWER $expectedUrl"
                     )
                 ))
         val sql = "SELECT count(*) FROM request WHERE url = :url AND gpb_id IS NULL"

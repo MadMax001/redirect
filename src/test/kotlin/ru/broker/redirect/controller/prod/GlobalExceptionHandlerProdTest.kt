@@ -12,12 +12,15 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.context.bean.override.mockito.MockitoBean
+import ru.broker.redirect.TestConstants.Companion.ERROR_TEXT
+import ru.broker.redirect.config.SecurityConfiguration
+import ru.broker.redirect.config.SecurityProdConfiguration
 import ru.broker.redirect.dao.RequestDao
 import ru.broker.redirect.service.Redirector
 
 @ActiveProfiles("prod")
 @WebMvcTest(MainControllerProd::class)
-@Import(GlobalExceptionHandlerProd::class)
+@Import(SecurityProdConfiguration::class, SecurityConfiguration::class, GlobalExceptionHandlerProd::class)
 class GlobalExceptionHandlerProdTest {
     private val errorUrl = "https://example.com/error"
 
@@ -40,7 +43,7 @@ class GlobalExceptionHandlerProdTest {
 
     @Test
     fun anyExceptionInProcessLeadsToDefaultRedirectTest() {
-        val error = RuntimeException("Что-то пошло не так")
+        val error = RuntimeException(ERROR_TEXT)
         whenever(redirector.buildRedirectUrl(Mockito.any()))
             .thenThrow(error)
 

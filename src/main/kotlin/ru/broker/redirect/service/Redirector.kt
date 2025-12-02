@@ -4,6 +4,9 @@ import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import ru.broker.redirect.aspect.DecryptionLogDB
+import ru.broker.redirect.config.Constants.Companion.DECRYPTION_ERROR_TEXT
+import ru.broker.redirect.config.Constants.Companion.FINISH_REDIRECT_PROCESS
+import ru.broker.redirect.config.Constants.Companion.START_REDIRECT_PROCESS
 import java.util.UUID
 
 /**
@@ -25,11 +28,11 @@ class Redirector (private val encryptor: SymmetricEncryptor) {
         val encryptedUrl : String? = request?.getParameter("p1")
         val iv : String? = request?.getParameter("p2")
         val gpbIdString : String? = request?.getParameter("p3")
-        logger.info("[$gpbIdString]. Запрос на перенаправление")
+        logger.info("[$gpbIdString]. $START_REDIRECT_PROCESS")
         val gpbId = safeBuildUUID(gpbIdString)
         val redirectUrl = encryptor.decryptUrl(encryptedUrl, iv)
-            ?: throw RuntimeException("[$gpbId]. Не удалось расшифровать ссылку")
-        logger.info("[$gpbIdString]. Ссылка на $redirectUrl")
+            ?: throw RuntimeException("[$gpbId]. $DECRYPTION_ERROR_TEXT")
+        logger.info("[$gpbIdString]. $FINISH_REDIRECT_PROCESS $redirectUrl")
         return redirectUrl
     }
 

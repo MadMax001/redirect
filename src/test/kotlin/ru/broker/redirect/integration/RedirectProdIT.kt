@@ -1,4 +1,4 @@
-package ru.broker.redirect.integration.prod
+package ru.broker.redirect.integration
 
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
