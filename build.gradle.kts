@@ -7,7 +7,7 @@ plugins {
 
 val majorVersion = "0"
 val minorVersion = "5"
-val patchVersion = "0"
+val patchVersion = "1"
 val isSnapshot = true
 
 group = "ru.broker"

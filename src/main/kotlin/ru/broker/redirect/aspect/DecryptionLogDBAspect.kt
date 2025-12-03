@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import ru.broker.redirect.model.Request
@@ -21,6 +22,7 @@ class DecryptionLogDBAspect(
     @Value("\${redirect.errorUrl}") private val errorUrl: String
 ) {
     private val gpbIdRequestParamName = "p3"
+    private val logger = LoggerFactory.getLogger(this::class.java)
 
     /**
      * Прокси-обертка вокруг метода расшифровки ссылки
@@ -29,7 +31,8 @@ class DecryptionLogDBAspect(
     fun decryptUrlAroundWorker(joinPoint: ProceedingJoinPoint): Any {
         val result = try {
             joinPoint.proceed()
-        } catch (ignore: RuntimeException) {
+        } catch (error: RuntimeException) {
+            logger.error("", error)
             null
         }
         val url = result as? String ?: errorUrl

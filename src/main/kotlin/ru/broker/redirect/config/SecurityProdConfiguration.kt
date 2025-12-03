@@ -27,7 +27,7 @@ class SecurityProdConfiguration {
                 response: HttpServletResponse?,
                 authException: AuthenticationException?
             ) {
-                logger.info("$LOG_AUTHENTIFICATION_ERROR_REDIRECT, ${request?.requestURI}. ${authException?.message}")
+                logger.info("$LOG_AUTHENTIFICATION_ERROR_REDIRECT, ${request?.requestURI} ${authException?.message}")
                 response?.sendRedirect(errorUrl)
             }
 
